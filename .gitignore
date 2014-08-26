@@ -1,0 +1,5 @@
+*.py[co]
+cli_log.txt
+*.swp.*
+*.*~$
+*.log

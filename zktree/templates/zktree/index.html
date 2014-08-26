@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">	
+<!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+
+<link type="text/css" rel="stylesheet" href="/css/zookeeper_dashboard.css" />
+<title>ZooKeeper ZNode {{znode.path}}</title>
+</head>
+
+<body>
+<div class="container">
+<h1>ZooKeeper ZNode {{znode.path}}</h1>
+
+<hr/>
+<div class="span-24 last">
+Path : {{znode.path}}
+<p>
+
+Data({{znode.datatype}}) : {{znode.data}}
+<p>
+
+</div>
+<hr/>
+<div class="span-24 last">
+<h2>Stat Information</h2>
+
+<table>
+  <tr><td>czxid</td><td>0x{{znode.stat.czxid|stringformat:"x"}}</td></tr>
+  <tr><td>mzxid</td><td>0x{{znode.stat.mzxid|stringformat:"x"}}</td></tr>
+  <tr><td>ctime</td><td>{{znode.stat.ctime|date}} {{znode.stat.ctime|time}} ({{znode.stat.ctime|timesince}} ago)</td></tr>
+  <tr><td>mtime</td><td>{{znode.stat.mtime|date}} {{znode.stat.mtime|time}} ({{znode.stat.mtime|timesince}} ago)</td></tr>
+  <tr><td>version</td><td>{{znode.stat.version}}</td></tr>
+  <tr><td>cversion</td><td>{{znode.stat.cversion}}</td></tr>
+  <tr><td>aversion</td><td>{{znode.stat.aversion}}</td></tr>
+{% ifnotequal znode.stat.ephemeralOwner 0 %}
+  <tr><td>ephemeralOwner</td><td>0x{{znode.stat.ephemeralOwner|stringformat:"x"}}</td></tr>
+{% endifnotequal %}
+  <tr><td>dataLength</td><td>{{znode.stat.dataLength}}</td></tr>
+  <tr><td>pzxid</td><td>0x{{znode.stat.pzxid|stringformat:"x"}}</td></tr>
+</table>
+<a href="http://hadoop.apache.org/zookeeper/docs/current/zookeeperProgrammers.html#sc_zkStatStructure" class="doc">Details on Stat fields</a>
+
+<p>
+</div>
+<hr/>
+<div class="span-24 last">
+<h2>ACL Information</h2>
+
+{% if znode.acls %}
+ACLs ({{znode.acls|length}})
+<table>
+  <tr><th>scheme</th><th>id</th><th>perms</th></tr>
+  {% for acl in znode.acls %}
+  <tr><td>{{acl.scheme}}</td><td>{{acl.id}}</td><td>
+    {% for perm in acl.perm_list %}
+    {% if not forloop.first %}, {% endif %}
+    {{perm}}
+    {% endfor %}
+  </td></tr>
+{% endfor %}
+</table>
+<a href="http://hadoop.apache.org/zookeeper/docs/current/zookeeperProgrammers.html#sc_ZooKeeperAccessControl" class="doc">Details on ACLs</a>
+{% else %}
+No ACLs exist for this znode
+{% endif %}
+
+<p>
+</div>
+<hr/>
+<div class="span-24 last">
+<h2>Children ({{znode.stat.numChildren}})</h2>
+
+{% if znode.children %}
+<table>
+  {% for child in znode.children %}
+  <tr class="{% cycle 'oddrow' 'evenrow' %}"><td><a href="{{child|urlencode}}">{{child}}</a></td></tr>
+{% endfor %}
+</table>
+{% else %}
+No Children exist for this znode
+{% endif %}
+</div>
+</div>
+
+</body> </html>
