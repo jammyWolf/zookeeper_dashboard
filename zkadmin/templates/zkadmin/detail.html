@@ -1,60 +1,97 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
-<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
-<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">	
-<!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+    <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+    <!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
-<link type="text/css" rel="stylesheet" href="/css/zookeeper_dashboard.css" />
-<title>ZooKeeper Server {{server_data.id}}</title>
+    <link type="text/css" rel="stylesheet" href="/css/zookeeper_dashboard.css" />
+    <br />
+    <title>ZooKeeper Dashboard</title>
+    <script>
+      function createForm(child){
+        var f = document.createElement("form");
+        document.body.appendChild(f);
+        var i = document.createElement("input");
+        i.type = "hidden";
+        f.appendChild(i);
+        if("{{znode.path}}" == '/')
+          i.value = "{{znode.path}}"+child;
+        else{i.value = "{{znode.path}}"+"/"+child;}
+        i.name = "path";
+        f.method = "post";
+        f.action = "/cluster/"+"{{cluster_name}}/";
+        f.submit();
+      }
+    </script>
 </head>
 
-<body>
-<div class="container">
-<h1>ZooKeeper Server {{server_data.host}}:{{server_data.port}}</h1>
-<hr/>
-<div class="span-24 last">
-<h2>Summary</h2>
-
-<table class="server_summary">
-  <tr><td>Host</td><td>{{server_data.host}}</td></tr>
-  <tr><td>Client port</td><td>{{server_data.port}}</td></tr>
-  <tr><td>Mode</td><td>{{server_data.mode|capfirst}}</td></tr>
-  <tr><td>Zxid</td><td>{{server_data.zxid}}</td></tr>
-  <tr><td>Node count</td><td>{{server_data.node_count}}</td></tr>
-  <tr><td>Connection count</td><td>{{server_data.sessions|length}}</td></tr>
-  <tr><td>Received</td><td>{{server_data.received}}</td></tr>
-  <tr><td>Sent</td><td>{{server_data.sent}}</td></tr>
-  <tr><td>Outstanding</td><td>{{server_data.outstanding}}</td></tr>
-  <tr><td>Max Latency</td><td>{{server_data.max_latency}}</td></tr>
-  <tr><td>Avg Latency</td><td>{{server_data.avg_latency}}</td></tr>
-  <tr><td>Min Latency</td><td>{{server_data.min_latency}}</td></tr>
-</table>
-</div>
-<hr/>
-<div class="span-24 last">
-<h2>Connections (clients)</h2>
-
-<table class="conn_list">
-  <tr><th>host</th><th>port</th><th>interest ops</th><th>queued#</th><th>recved#</th><th>sent#</th></tr>
-{% for s in server_data.sessions %}
-  <tr class="{% cycle 'oddrow' 'evenrow' %}"><td>{{s.host}}</td><td>{{s.port}}</td><td>{{s.interest_ops}}</td><td>{{s.queued}}</td><td>{{s.recved}}</td><td>{{s.sent}}</td></tr>
-{% endfor %}
-</table>
-</div>
-<hr/>
-<div class="span-24 last">
-<h2>Environment</h2>
-
-<table class="envi_list">
-  <tr><th>Attribute</th><th>Value</th></tr>
-{% for e in server_data.envi %}
-  <tr class="{% cycle 'oddrow' 'evenrow' %}"><td>{{e.0}}</td><td>{{e.1}}</td></tr>
-{% endfor %}
-</table>
-</div>
-<hr/>
-</div>
-
-</body> </html>
+  <body>
+    <div class="container">
+      <h1>ZooKeeper ZNode {{znode.path}}</h1>
+      <hr/>
+      <div class="span-24 last">
+        Path : {{znode.path}}
+        <p>Data({{znode.datatype}}) : {{znode.data}}<p>
+      </div>
+      <hr/>
+      {%if znode.children%}
+      <div class="span-24 last">
+        <h2>Stat Information</h2>
+        <table>
+          <tr><td>czxid</td><td>0x{{znode.stat.czxid|stringformat:"x"}}</td></tr>
+          <tr><td>mzxid</td><td>0x{{znode.stat.mzxid|stringformat:"x"}}</td></tr>
+          <tr><td>ctime</td><td>{{znode.stat.ctime|date}} {{znode.stat.ctime|time}} ({{znode.stat.ctime|timesince}} ago)</td></tr>
+          <tr><td>mtime</td><td>{{znode.stat.mtime|date}} {{znode.stat.mtime|time}} ({{znode.stat.mtime|timesince}} ago)</td></tr>
+          <tr><td>version</td><td>{{znode.stat.version}}</td></tr>
+          <tr><td>cversion</td><td>{{znode.stat.cversion}}</td></tr>
+          <tr><td>aversion</td><td>{{znode.stat.aversion}}</td></tr>
+          {% ifnotequal znode.stat.ephemeralOwner 0 %}
+          <tr><td>ephemeralOwner</td><td>0x{{znode.stat.ephemeralOwner|stringformat:"x"}}</td></tr>
+          {% endifnotequal %}
+          <tr><td>dataLength</td><td>{{znode.stat.dataLength}}</td></tr>
+          <tr><td>pzxid</td><td>0x{{znode.stat.pzxid|stringformat:"x"}}</td></tr>
+        </table>
+      </div>
+      {%endif%}
+      <div class="span-24 last">
+        <h2>Children ({{znode.children|length}})</h2>
+        {% if znode.children %}
+        <table>
+          {% for child in znode.children %}
+          <tr class="{% cycle 'oddrow' 'evenrow' %}">
+            <td><a href="javascript:void(0)" onclick='createForm("{{child}}");'>{{child}}</a></td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% else %}
+        No Children exist for this znode
+        {% endif %}
+      </div>
+      <div class="span-24 last">
+        <h2>Server Information</h2>
+        <table>
+          <tr>
+            <th>server</th>
+            <th>mode</th>
+            <th>#conn</th>
+            <th>version</th>
+          </tr>
+          {% for sd in server_data %}
+          <tr class="{% cycle 'oddrow' 'evenrow' %}">
+            <td><a href="cluster/server/{{sd.id}}">{{ sd.host }}:{{ sd.port }}</a> </td>
+            <td> 
+              {% ifequal sd.mode "leader" %}
+              <b>{% endifequal %} {{sd.mode|capfirst}} {% ifequal sd.mode "leader" %}</b>
+              {% endifequal %} 
+            </td>
+            <td> {{ sd.sessions|length }} </td>
+            <td> {{ sd.version }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

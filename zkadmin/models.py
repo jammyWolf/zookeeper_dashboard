@@ -17,6 +17,17 @@ class Session(object):
             k,v = d.split("=")
             self.__dict__[k] = v
 
+class ZKCluster(object):
+    def __init__(self, cluster_name):
+        self.cluster_name = cluster_name
+
+    def cluster(self, cluster_list):
+        self.cluster_list = []
+        for each in cluster_list:
+            zkserver = ZKServer(each) 
+            self.cluster_list.append(zkserver)
+        return self.cluster_list
+          
 class ZKServer(object):
     def __init__(self, server):
         self.host, self.port = server.split(':')

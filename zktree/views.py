@@ -10,7 +10,6 @@ def istext(s, text_chars="".join(map(chr, range(32, 127))) + "\n\r\t\b"):
     return len(t) == 0
 
 def index(request, path=""):
-    print(path)
     path = "/" + path
     try:
         znode = ZNode(path)
@@ -26,3 +25,7 @@ def index(request, path=""):
     except Exception as err:
         return render_to_response('zktree/error.html',
                                   {'error':str(err)})
+
+def create(request):
+    print request.POST, request.GET
+    return render_to_response('zktree/index.html')

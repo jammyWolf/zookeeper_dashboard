@@ -1,9 +1,7 @@
 # Django settings for zookeeper_dashboard project.
 
 ### ZooKeeper specific settings
-
-ZOOKEEPER_SERVERS = "10.10.140.63:2181,cloudcomputing-zookeeper-online001-bjdxt.qiyi.virtual:2181"
-
+from servers import ZOOKEEPER_SERVERS
 ### From here down are Django settings
 
 DEBUG = True

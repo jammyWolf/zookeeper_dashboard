@@ -11,6 +11,7 @@ PERM_DELETE = 8
 PERM_ADMIN = 16
 PERM_ALL = PERM_READ | PERM_WRITE | PERM_CREATE | PERM_DELETE | PERM_ADMIN
 
+ZOO_OPEN_ACL_UNSAFE = {"perms":0x1f, "scheme":"world", "id" :"anyone"}
 zookeeper.set_log_stream(open("cli_log.txt","w"))
 
 TIMEOUT = 10.0
@@ -42,6 +43,22 @@ class ZKClient(object):
     def close(self):
         zookeeper.close(self.handle)
     
+    def create(self, path, data="", flags=0, acl=[ZOO_OPEN_ACL_UNSAFE]):
+        start = time.time()
+        result = zookeeper.create(self.handle, path, data, acl, flags)
+        if VERBOSE:
+            print("Node %s created in %d ms"
+                  % (path, int((time.time() - start) * 1000)))
+        return result
+
+    def delete(self, path, version=-1):
+        start = time.time()
+        result = zookeeper.delete(self.handle, path, version)
+        if VERBOSE:
+            print("Node %s deleted in %d ms"
+                  % (path, int((time.time() - start) * 1000)))
+        return result
+
     def get(self, path, watcher=None):
         return zookeeper.get(self.handle, path, watcher)
 

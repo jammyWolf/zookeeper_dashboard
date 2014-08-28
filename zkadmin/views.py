@@ -3,22 +3,33 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from zookeeper_dashboard.zkadmin.models import ZKServer
+from zknode import ZNode
+from models import ZKCluster
 
-ZOOKEEPER_SERVERS = getattr(settings,'ZOOKEEPER_SERVERS').split(',')
+from servers import ZOOKEEPER_SERVERS
+
+def getCluster(cluster_name, path):
+    zk_cluster = ZKCluster(cluster_name)
+    server_data = zk_cluster.cluster(ZOOKEEPER_SERVERS[cluster_name])
+    for e in server_data:
+        if e.mode == 'leader':
+            leader_data = e
+            break
+    try:
+        leader_url = leader_data.host+':'+leader_data.port
+    except:
+        leader_url = ZOOKEEPER_SERVERS[cluster_name][0]
+    znode = ZNode(leader_url, path)
+    return server_data, znode
 
 def index(request):
-    server_data = []
-    for i, server in enumerate(ZOOKEEPER_SERVERS):
-        zkserver = ZKServer(server)
-        zkserver.id = i
-        server_data.append(zkserver)
-
     return render_to_response('zkadmin/index.html',
-                              {'ZOOKEEPER_SERVERS':ZOOKEEPER_SERVERS,
-                               'server_data':server_data},context_instance=RequestContext(request) )
+                              {'server_data':ZOOKEEPER_SERVERS.keys()},context_instance=RequestContext(request) )
 
-def detail(request, server_id):
-    server_data = ZKServer(ZOOKEEPER_SERVERS[int(server_id)])
-    server_data.id = server_id
+def detail(request, cluster_name):
+    path = '/'
+    if request.POST != [] and 'path' in request.POST:
+        path=request.POST['path']
+    server_data, znode = getCluster(cluster_name, path)
     return render_to_response('zkadmin/detail.html',
-                              {'server_data':server_data})
+            {'server_data':server_data, 'znode':znode, 'cluster_name':cluster_name})
