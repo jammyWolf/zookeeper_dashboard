@@ -16,9 +16,9 @@
         var i = document.createElement("input");
         i.type = "hidden";
         f.appendChild(i);
-        if("{{znode.path}}" == '/')
-          i.value = "{{znode.path}}"+child;
-        else{i.value = "{{znode.path}}"+"/"+child;}
+        if("{{path}}" == '/')
+          i.value = "{{path}}"+child;
+        else{i.value = "{{path}}"+"/"+child;}
         i.name = "path";
         f.method = "post";
         f.action = "/cluster/"+"{{cluster_name}}/";
@@ -29,69 +29,92 @@
 
   <body>
     <div class="container">
-      <h1>ZooKeeper ZNode {{znode.path}}</h1>
+      <h1>ZooKeeper Server:  <font color="grey">{{cluster_name}}</font></h1>
       <hr/>
       <div class="span-24 last">
-        Path : {{znode.path}}
-        <p>Data({{znode.datatype}}) : {{znode.data}}<p>
-      </div>
-      <hr/>
-      {%if znode.children%}
-      <div class="span-24 last">
-        <h2>Stat Information</h2>
-        <table>
-          <tr><td>czxid</td><td>0x{{znode.stat.czxid|stringformat:"x"}}</td></tr>
-          <tr><td>mzxid</td><td>0x{{znode.stat.mzxid|stringformat:"x"}}</td></tr>
-          <tr><td>ctime</td><td>{{znode.stat.ctime|date}} {{znode.stat.ctime|time}} ({{znode.stat.ctime|timesince}} ago)</td></tr>
-          <tr><td>mtime</td><td>{{znode.stat.mtime|date}} {{znode.stat.mtime|time}} ({{znode.stat.mtime|timesince}} ago)</td></tr>
-          <tr><td>version</td><td>{{znode.stat.version}}</td></tr>
-          <tr><td>cversion</td><td>{{znode.stat.cversion}}</td></tr>
-          <tr><td>aversion</td><td>{{znode.stat.aversion}}</td></tr>
-          {% ifnotequal znode.stat.ephemeralOwner 0 %}
-          <tr><td>ephemeralOwner</td><td>0x{{znode.stat.ephemeralOwner|stringformat:"x"}}</td></tr>
-          {% endifnotequal %}
-          <tr><td>dataLength</td><td>{{znode.stat.dataLength}}</td></tr>
-          <tr><td>pzxid</td><td>0x{{znode.stat.pzxid|stringformat:"x"}}</td></tr>
+        {% if server_data %}
+        <h2>Leader Summary</h2>
+        <table class="server_summary">
+          <tr>
+            <td>Host</td>
+            <td>{{server_data.host}}</td>
+          </tr>
+          <tr>
+            <td>Client port</td>
+            <td>{{server_data.port}}</td>
+          </tr>
+          <tr>
+            <td>Mode</td>
+            <td>{{server_data.mode|capfirst}}</td>
+          </tr>
+          <tr>
+            <td>Zxid</td>
+            <td>{{server_data.zxid}}</td>
+          </tr>
+          <tr>
+            <td>Node count</td>
+            <td>{{server_data.node_count}}</td>
+          </tr>
+          <tr>
+            <td>Connection count</td>
+            <td>{{server_data.sessions|length}}</td>
+          </tr>
+          <tr>
+            <td>Received</td>
+            <td>{{server_data.received}}</td>
+          </tr>
+          <tr>
+            <td>Sent</td>
+            <td>{{server_data.sent}}</td>
+          </tr>
+          <tr>
+            <td>Outstanding</td>
+            <td>{{server_data.outstanding}}</td>
+          </tr>
+          <tr>
+            <td>Max Latency</td>
+            <td>{{server_data.max_latency}}</td>
+          </tr>
+          <tr>
+            <td>Avg Latency</td>
+            <td>{{server_data.avg_latency}}</td>
+          </tr>
+          <tr>
+            <td>Min Latency</td>
+            <td>{{server_data.min_latency}}</td>
+          </tr>
         </table>
+        {%else%}
+        <h2>Znode Info</h2>
+        <table class="server_summary">
+          <tr>
+            <td>Path</td>
+            <td>{{ path }}</td>
+          </tr>
+          <tr>
+            <td>Data</td>
+            <td>{{ data }}</td>
+          </tr>
+          <tr>
+            <td>Stats</td>
+            <td>{{ stat }}</td>
+          </tr>
+          </table>
+        {% endif %}
       </div>
-      {%endif%}
       <div class="span-24 last">
         <h2>Children ({{znode.children|length}})</h2>
         {% if znode.children %}
         <table>
           {% for child in znode.children %}
-          <tr class="{% cycle 'oddrow' 'evenrow' %}">
-            <td><a href="javascript:void(0)" onclick='createForm("{{child}}");'>{{child}}</a></td>
-          </tr>
+          <tr class="{% cycle 'oddrow' 'evenrow' %}"><td><a href="javascript:void(0)" onclick='createForm("{{child}}");'>{{child}}</a></td></tr>
           {% endfor %}
         </table>
         {% else %}
-        No Children exist for this znode
+          No Children exist for this znode.
         {% endif %}
       </div>
-      <div class="span-24 last">
-        <h2>Server Information</h2>
-        <table>
-          <tr>
-            <th>server</th>
-            <th>mode</th>
-            <th>#conn</th>
-            <th>version</th>
-          </tr>
-          {% for sd in server_data %}
-          <tr class="{% cycle 'oddrow' 'evenrow' %}">
-            <td><a href="cluster/server/{{sd.id}}">{{ sd.host }}:{{ sd.port }}</a> </td>
-            <td> 
-              {% ifequal sd.mode "leader" %}
-              <b>{% endifequal %} {{sd.mode|capfirst}} {% ifequal sd.mode "leader" %}</b>
-              {% endifequal %} 
-            </td>
-            <td> {{ sd.sessions|length }} </td>
-            <td> {{ sd.version }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
     </div>
+    <hr/>
   </body>
 </html>

@@ -2,6 +2,7 @@ import re
 import StringIO
 import telnetlib
 
+from servers import ZOOKEEPER_SERVERS
 OP_READ = 1
 OP_WRITE = 4
 OP_CONNECT = 8
@@ -17,17 +18,6 @@ class Session(object):
             k,v = d.split("=")
             self.__dict__[k] = v
 
-class ZKCluster(object):
-    def __init__(self, cluster_name):
-        self.cluster_name = cluster_name
-
-    def cluster(self, cluster_list):
-        self.cluster_list = []
-        for each in cluster_list:
-            zkserver = ZKServer(each) 
-            self.cluster_list.append(zkserver)
-        return self.cluster_list
-          
 class ZKServer(object):
     def __init__(self, server):
         self.host, self.port = server.split(':')
@@ -53,6 +43,7 @@ class ZKServer(object):
         for line in sio:
             attr, value = line.split(':')
             attr = attr.strip().replace(" ", "_").replace("/", "_").lower()
+            print attr, value
             self.__dict__[attr] = value.strip()
 
         self.min_latency, self.avg_latency, self.max_latency = self.latency_min_avg_max.split("/")
@@ -67,10 +58,31 @@ class ZKServer(object):
 
     def send_cmd(self, cmd):
         tn = telnetlib.Telnet(self.host, self.port)
-
         tn.write(cmd)
-
         result = tn.read_all()
         tn.close()
-
         return result
+
+def main():
+    zk_cluster = ZKCluster("me")
+    server_data = zk_cluster.cluster(ZOOKEEPER_SERVERS['me'])
+    # print dir(server_data)
+    # for e in server_data:
+    #     print e.node_count
+    #     if e.mode == 'leader':
+    #         leader_data = e
+    #         break
+    #         'connections', 'envi', 'host','mode', 'node_count', 'port', 'received', 'sent', 'version'
+    # print leader_data.connections
+    # print leader_data.envi
+    # print leader_data.node_count
+    # print leader_data.received
+        # try:
+        #     leader_url = leader_data.host+':'+leader_data.port
+        # except:
+        #     leader_url = ZOOKEEPER_SERVERS[cluster_name][0]
+        # znode = ZNode(leader_url, path)
+        # return server_data, znode
+
+if __name__ == '__main__':
+    main()

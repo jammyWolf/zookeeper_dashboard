@@ -19,11 +19,18 @@
 <h2>Cluster Information</h2>
 
 <table>
-<tr><th>#</th><th>cluster</th></tr>
-  {% for cluster in server_data %}
+	<tr>
+		<th>#</th>
+		<th>Cluster</th>
+		<th>NodeCount</th>
+		<th>EphemeralCount</th>
+	</tr>
+  {% for cluster in cluster_info %}
   <tr class="{% cycle 'oddrow' 'evenrow' %}">
     <td width="5%">{{ forloop.counter }}</td>
-    <td><a href="cluster/{{cluster}}">{{ cluster }}</a> </td>
+    <td><a href="cluster/{{cluster.cluster_name}}">{{ cluster.cluster_name }}</a> </td>
+    <td>{{ cluster.node_count }}</td>
+    <td>{{ cluster.ephemeral_count }}</td>
   </tr>
   {% endfor %}
 </table>
