@@ -1,0 +1,16 @@
+<uwsgi>
+    <socket>0.0.0.0:8800</socket>
+    <workers>4</workers>
+    <processes>4</processes>
+	<chdir>/opt/code/zookeeper_dashboard/</chdir>
+    <touch-reload>/opt/code/zookeeper_dashboard/VERSION</touch-reload>
+    <pythonpath>..</pythonpath>
+    <module>wsgi</module>
+    <pidfile>zoo.pid</pidfile>
+    <master>true</master>
+    <enable-threads>true</enable-threads>
+    <logdate>true</logdate>
+	<daemonize>/var/log/zookeeper_dashboard/zookeeper_dashboard.log</daemonize>
+    <buffer-size>64000</buffer-size>
+    <max-requests>100</max-requests>
+</uwsgi>

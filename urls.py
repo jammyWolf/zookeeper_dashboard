@@ -7,7 +7,6 @@ from django.conf import settings
 
 urlpatterns = patterns('zookeeper_dashboard',
     (r'^cluster/', include('zookeeper_dashboard.zkadmin.urls')),
-    (r'^tree/', include('zookeeper_dashboard.zktree.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

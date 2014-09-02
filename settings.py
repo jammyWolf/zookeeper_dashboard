@@ -1,7 +1,5 @@
 # Django settings for zookeeper_dashboard project.
 
-### ZooKeeper specific settings
-from servers import ZOOKEEPER_SERVERS
 ### From here down are Django settings
 
 DEBUG = True
@@ -84,5 +82,4 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'zookeeper_dashboard.zkadmin',
-    'zookeeper_dashboard.zktree',
 )

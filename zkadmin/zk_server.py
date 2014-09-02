@@ -9,6 +9,20 @@ from kazoo.client import KazooClient, KazooState, KeeperState
 
 from servers import ZOOKEEPER_SERVERS
 
+def decode(sdata, path='?'):
+    s = sdata.strip()
+    if not s:
+        data = {}
+    elif s.startswith('{') and s.endswith('}'):
+        try:
+            data = json.loads(s)
+        except:
+            logger.exception('bad json data in node at %r', path)
+            data = dict(string_value = sdata)
+    else:
+        data = dict(string_value = sdata)
+    return data
+
 class Session(object):
     def __init__(self, session):
         m = re.search('/(\d+\.\d+\.\d+\.\d+):(\d+)\[(\d+)\]\((.*)\)', session)
@@ -94,20 +108,62 @@ class ZNode(object):
                 )
         self.zk.start()
 
-    def ensure_path(self, path):
-        return  self.zk.ensure_path(path)
+    def exists_path(self, path):
+        return  self.zk.exists(path)
 
-    def children(self, path):
-        if self.ensure_path(path):
+    def get_children(self, path):
+        if self.exists_path(path):
             self.children = self.zk.get_children(path)
             return self.children
         else:
             return False
 
     def get_info(self, path):
-        if self.ensure_path(path):
+        if self.exists_path(path):
             #return data, stat
             return self.zk.get(path)
+
+    def export_tree(self, path='/', ephemeral=False, name=None):
+        output = []
+        out = output.append
+
+        def export_tree(path, indent, name=None):
+            children = self.get_children(path)
+            if path == '/':
+                path = ''
+                # if 'zookeeper' in children:
+                #     children.remove('zookeeper')
+                if name is not None:
+                    out(indent + '/' + name)
+                    indent += '  '
+            else:
+                data, meta = self.zk.get(path)
+                if meta.ephemeralOwner and not ephemeral:
+                    return
+                if name is None:
+                    name = path.rsplit('/', 1)[1]
+                properties = decode(data)
+                type_ = properties.pop('type', None)
+                if type_:
+                    name += ' : '+type_
+                out(indent + '/' + name)
+                indent += '  '
+                links = []
+                for i in sorted(properties.iteritems()):
+                    if i[0].endswith(' ->'):
+                        links.append(i)
+                    else:
+                        out(indent+"%s = %r" % i)
+                for i in links:
+                    out(indent+"%s %s" % i)
+
+            for name in sorted(children):
+                export_tree(path+'/'+name, indent)
+        try:
+            export_tree(path, '', name)
+            return '\n'.join(output)+'\n'
+        except Exception:
+            return "No Auth To Show Tree."
 
     def __del__(self):
         self.zk.stop()

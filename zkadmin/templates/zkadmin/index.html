@@ -7,6 +7,7 @@
 <!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
 <link type="text/css" rel="stylesheet" href="/css/zookeeper_dashboard.css" />
+<link type="text/css" rel="stylesheet" href="/css/table.css" />
 <br />
 <title>ZooKeeper Dashboard</title>
 </head>
@@ -18,21 +19,21 @@
 <div class="span-24 last">
 <h2>Cluster Information</h2>
 
-<table>
+<table class="gridtable" border="1">
 	<tr>
-		<th>#</th>
+		<th><center>#</center></th>
 		<th>Cluster</th>
 		<th>NodeCount</th>
 		<th>EphemeralCount</th>
 	</tr>
-  {% for cluster in cluster_info %}
-  <tr class="{% cycle 'oddrow' 'evenrow' %}">
-    <td width="5%">{{ forloop.counter }}</td>
-    <td><a href="cluster/{{cluster.cluster_name}}">{{ cluster.cluster_name }}</a> </td>
-    <td>{{ cluster.node_count }}</td>
-    <td>{{ cluster.ephemeral_count }}</td>
-  </tr>
-  {% endfor %}
+      {% for cluster in cluster_info %}
+      <tr class="{% cycle 'oddrow' 'evenrow' %}">
+        <td width="5%"><center>{{ forloop.counter }}</center></td>
+        <td><a href="cluster/{{cluster.cluster_name}}">{{ cluster.cluster_name }}</a> </td>
+        <td>{{ cluster.node_count }}</td>
+        <td>{{ cluster.ephemeral_count }}</td>
+      </tr>
+      {% endfor %}
 </table>
 <p>
 </div>

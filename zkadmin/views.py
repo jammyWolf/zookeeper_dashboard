@@ -25,12 +25,14 @@ def detail(request, cluster_name):
         path=request.POST['path']
     zk = ZKCluster(cluster_name)
     znode = zk.znode
-    znode.children(path)
+    children = znode.get_children(path)
+    tree = znode.export_tree(path)
     if path == "/":
         server_data =  zk.leader
     else:
         data, stat = znode.get_info(path)
-        print path, data
+    
     
     return render_to_response('zkadmin/detail.html',
            locals())
+

@@ -2,6 +2,7 @@
 <html>
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+    <link type="text/css" rel="stylesheet" href="/css/table.css" />
     <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
     <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
     <!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
@@ -9,6 +10,27 @@
     <link type="text/css" rel="stylesheet" href="/css/zookeeper_dashboard.css" />
     <br />
     <title>ZooKeeper Dashboard</title>
+    <style type="text/css">
+      *{margin:0; padding:0}
+      #nav{width:100%; margin:0px}
+      #nav h2{ cursor:pointer; line-height:27px; height:27px; background-color:#242424;font-size:12px;padding: 3px;color:#FFFFFF;border-style: solid;
+      border-color: #CBCBCB;}
+      #nav a{display:block; line-height:24px;color:#666666}
+      #nav a:hover{background-color:#eee; color:#000;}
+      #nav div{display:none; border:1px solid #000; border-top:none}
+    </style>
+    <script type="text/javascript">
+      function $(id){return document.getElementById(id)}
+      window.onload = function(){
+       $("nav").onclick = function(e){
+        var src = e?e.target:event.srcElement;
+        if(src.tagName == "H2"){
+         var next = src.nextElementSibling || src.nextSibling;
+         next.style.display = (next.style.display =="block")?"none":"block";
+        }
+       }
+      }
+    </script>
     <script>
       function createForm(child){
         var f = document.createElement("form");
@@ -102,12 +124,25 @@
           </table>
         {% endif %}
       </div>
+      <div  id="nav" class="span-24 last">
+        <h2 class="gridtable"><b>Tree</b></h2>
+        <div>
+          <pre>{{ tree }}</pre>
+        </div>
+      </div>
       <div class="span-24 last">
-        <h2>Children ({{znode.children|length}})</h2>
-        {% if znode.children %}
-        <table>
-          {% for child in znode.children %}
-          <tr class="{% cycle 'oddrow' 'evenrow' %}"><td><a href="javascript:void(0)" onclick='createForm("{{child}}");'>{{child}}</a></td></tr>
+        <h2>Children ({{children|length}})</h2>
+        {% if children %}
+        <table class="gridtable" border="1">
+          <tr>
+            <th><center>#</center></th>
+            <th>child_name</th>
+          <tr>
+          {% for child in children %}
+          <tr class="{% cycle 'oddrow' 'evenrow' %}">
+            <td width="5%"><center>{{ forloop.counter }}</center></td>
+            <td><a href="javascript:void(0)" onclick='createForm("{{child}}");'>{{child}}</a></td>
+          </tr>
           {% endfor %}
         </table>
         {% else %}

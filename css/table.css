@@ -1,0 +1,33 @@
+table.gridtable {
+            font-family: verdana,arial,sans-serif;
+            font-size:11px;
+            color:#333333;
+            border-width: 1px;
+            border-color:  #CBCBCB;
+            border-collapse: collapse;
+}
+table.gridtable th {
+    border-width: 1px;
+    padding: 8px;
+    color:#FFFFFF;
+    border-style: solid;
+    border-color: #CBCBCB;
+    background-color: #242424;
+}
+table.gridtable tr.oddrow  td {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #CBCBCB;
+    background-color: #ffffff;
+}
+table.gridtable tr.evenrow td{
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #CBCBCB;
+    background-color: #F3F3F3;
+}
+table.gridtable tr td.red{
+    color:#E51400;
+}
