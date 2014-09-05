@@ -1,15 +1,18 @@
 #encoding: utf-8
 import re
+import json
 import StringIO
 import telnetlib
 
-import kazoo
-from kazoo.protocol.states import ZnodeStat
-from kazoo.client import KazooClient, KazooState, KeeperState
+from kazoo.client import KazooClient
 
 from servers import ZOOKEEPER_SERVERS
 
 def decode(sdata, path='?'):
+    '''
+    Code from zc.zk, authored by @Jim Fulton. 
+    '''
+
     s = sdata.strip()
     if not s:
         data = {}
@@ -17,7 +20,6 @@ def decode(sdata, path='?'):
         try:
             data = json.loads(s)
         except:
-            logger.exception('bad json data in node at %r', path)
             data = dict(string_value = sdata)
     else:
         data = dict(string_value = sdata)
@@ -40,16 +42,28 @@ class ZKServer(object):
 
     @property
     def mode(self):
+        '''
+        Telnet server to exec cmd 'stats' to get server mode(follower, standalone, leader).
+        '''
+
         t = self.send_cmd('stats\n')
         mode = filter(lambda s:re.match(r'Mode: \w*$',s) , t.split("\n"))[0].split()[-1]
         return mode
 
     def get_info(self):
+        '''
+        Telnet server to exec cmd to get server basic info.
+        '''
+
         self._get_stat()
         self._get_envi()
         self._get_dump()
 
     def _get_envi(self):
+        '''
+        Get ZooKeeper environment info.
+        '''
+
         envi = self.send_cmd('envi\n')
         self.envi = []
         sio = StringIO.StringIO(envi)
@@ -60,6 +74,10 @@ class ZKServer(object):
             self.envi.append((attr, value))
 
     def _get_dump(self):
+        '''
+        Get ZooKeeper ephemerals node count.
+        '''
+
         dump = self.send_cmd('dump\n')
         self.emperemal_nodes = []
         sio = StringIO.StringIO(dump)
@@ -69,6 +87,10 @@ class ZKServer(object):
                 self.ephemeralNum = int(m.group('name'))
 
     def _get_stat(self):
+        '''
+        Get ZooKeeper server basic stats.
+        '''
+
         try:
             stat = self.send_cmd('stat\n')
         except:
@@ -101,6 +123,7 @@ class ZKServer(object):
         tn.close()
         return result
 
+
 class ZNode(object):
 
     def __init__(self, leader_name, path="/"):
@@ -120,13 +143,17 @@ class ZNode(object):
 
     def get_info(self, path):
         if self.exists_path(path):
-            #return data, stat
             return self.zk.get(path)
 
     def export_tree(self, path='/', ephemeral=False, name=None):
+        '''
+        Function: print tree of the children recursively, set given path as root.
+
+        These two functions 'export_tree' and 'decode' belongs to @Jim Fulton's zc.zk(https://pypi.python.org/pypi/zc.zk/2.0.1).But Jim's code will raise a kazoo.error.NoAuth error when call get_children() of node has auth_data, i copy his code rather import it.
+        '''
+
         output = []
         out = output.append
-
         def export_tree(path, indent, name=None):
             children = self.get_children(path)
             if path == '/':
@@ -171,18 +198,30 @@ class ZNode(object):
 class ZKCluster(object):
 
     def __init__(self, cluster_name):
+        '''
+        Config cluster with cluster_name, and choose leader node's info as the latest view by the config file: servers.py automatically.   
+        '''
+
         self.cluster_name = cluster_name
         self.server_list = self.get_server()
         self.znode = ZNode(self.node['leader'])
 
     @property
     def leader(self):
+        '''
+        If the cluster_name is not pointed to a cluster but a single host, the leader node is the STANDALONE node.
+        '''
+
         mode = self.node['leader'] != None and self.node['leader'] or self.node['standalone']
         z = ZKServer(mode)
         z.get_info()
         return z
 
     def get_server(self):
+        '''
+        Get cluster's servers list, and classify them to follower, leader, standalone.
+        '''
+
         server_list = []
         self.node = {'follower':[], 'leader':None, 'standalone':None}
         for each in ZOOKEEPER_SERVERS[self.cluster_name]:

@@ -1,5 +1,5 @@
 <uwsgi>
-    <socket>0.0.0.0:8800</socket>
+    <socket>0.0.0.0:8888</socket>
     <workers>4</workers>
     <processes>4</processes>
 	<chdir>/opt/code/zookeeper_dashboard/</chdir>
