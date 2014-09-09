@@ -1,29 +1,11 @@
 #encoding: utf-8
 import re
-import json
 import StringIO
 import telnetlib
 
 from kazoo.client import KazooClient
 
-from servers import ZOOKEEPER_SERVERS
-
-def decode(sdata, path='?'):
-    '''
-    Code from zc.zk, authored by @Jim Fulton. 
-    '''
-
-    s = sdata.strip()
-    if not s:
-        data = {}
-    elif s.startswith('{') and s.endswith('}'):
-        try:
-            data = json.loads(s)
-        except:
-            data = dict(string_value = sdata)
-    else:
-        data = dict(string_value = sdata)
-    return data
+from json_handler import decode
 
 class Session(object):
     def __init__(self, session):
@@ -123,12 +105,10 @@ class ZKServer(object):
         tn.close()
         return result
 
-
 class ZNode(object):
 
-    def __init__(self, leader_name, path="/"):
-        self.zk = KazooClient(hosts=leader_name, auth_data=[("digest","transcode:vtc" )]
-                )
+    def __init__(self, leader_name, auth_data):
+        self.zk = KazooClient(hosts=leader_name, auth_data=auth_data)
         self.zk.start()
 
     def exists_path(self, path):
@@ -194,44 +174,6 @@ class ZNode(object):
 
     def __del__(self):
         self.zk.stop()
-
-class ZKCluster(object):
-
-    def __init__(self, cluster_name):
-        '''
-        Config cluster with cluster_name, and choose leader node's info as the latest view by the config file: servers.py automatically.   
-        '''
-
-        self.cluster_name = cluster_name
-        self.server_list = self.get_server()
-        self.znode = ZNode(self.node['leader'])
-
-    @property
-    def leader(self):
-        '''
-        If the cluster_name is not pointed to a cluster but a single host, the leader node is the STANDALONE node.
-        '''
-
-        mode = self.node['leader'] != None and self.node['leader'] or self.node['standalone']
-        z = ZKServer(mode)
-        z.get_info()
-        return z
-
-    def get_server(self):
-        '''
-        Get cluster's servers list, and classify them to follower, leader, standalone.
-        '''
-
-        server_list = []
-        self.node = {'follower':[], 'leader':None, 'standalone':None}
-        for each in ZOOKEEPER_SERVERS[self.cluster_name]:
-            server = ZKServer(each)
-            if server.mode == "follower" :
-                self.node['follower'].append(each)
-            else:
-                self.node['leader'] = each
-            server_list.append(each)
-        return server_list
 
 def main():
     #zs = ZKServer("cloudcomputing-zookeeper-online001-bjdxt.qiyi.virtual:2181")

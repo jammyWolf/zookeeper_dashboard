@@ -2,10 +2,8 @@ from django.conf import settings
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
-from zknode import ZNode
-from zk_server import ZKCluster
+from zk_cluster import ZKCluster
 from servers import ZOOKEEPER_SERVERS
-
 
 def index(request):
     cluster_info = []
@@ -31,7 +29,6 @@ def detail(request, cluster_name):
         server_data =  zk.leader
     else:
         data, stat = znode.get_info(path)
-    
     
     return render_to_response('zkadmin/detail.html',
            locals())
