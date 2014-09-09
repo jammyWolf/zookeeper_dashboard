@@ -40,7 +40,7 @@ ACLs are supported by kazoo. Adding auth_data in zkadmin/servers.py for each clu
 h2. Screenshots
 
 h3. Cluster Summary
-<iframe src="https://www.flickr.com/photos/126871171@N03/15000042970/player/" width="75" height="75" frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+<a href="https://www.flickr.com/photos/126871171@N03/15000042970" title="1 by jammy wolf, on Flickr"><img src="https://farm6.staticflickr.com/5572/15000042970_3efa61ab38_s.jpg" width="75" height="75" alt="1"></a>
 
 h3. Server Summary
 <a href="https://www.flickr.com/photos/126871171@N03/15000143168" title="2 by jammy wolf, on Flickr"><img src="https://farm6.staticflickr.com/5559/15000143168_ee4b364efb_s.jpg" width="75" height="75" alt="2"></a>
