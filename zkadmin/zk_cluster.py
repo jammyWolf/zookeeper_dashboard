@@ -46,8 +46,6 @@ class ZKCluster(object):
         return server_list
 
 def main():
-    import re
-    #zs = ZKServer("cloudcomputing-zookeeper-online001-bjdxt.qiyi.virtual:2181")
     zs = ZKCluster("bj")
     print zs.leader.mode, zs.leader.port
 
