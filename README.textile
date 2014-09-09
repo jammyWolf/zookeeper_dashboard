@@ -1,0 +1,57 @@
+h1. ZooKeeper Dashboard
+
+*Author: "jammyWolf"
+
+h2. Summary
+
+"This project":http://github.com/jammyWolf/zookeeper_dashboard uses Django framework and the zc.zk and kazoo bindings to provide a dashboard for a ZooKeeper ensemble (cluster).
+Plus, the web design is contributed by Plunt Hunt's project-http://github.com/phunt/zookeeper_dashboard
+
+* Configration support auth_data and multiple clusters
+* Clusters's leader server infomation
+* the info of each child node and display tree of a certain path
+
+h3. What's Apache ZooKeeper?
+
+From the "official site":http://hadoop.apache.org/zookeeper/: "ZooKeeper is a high-performance coordination service for distributed applications."
+
+It exposes common services - such as naming, configuration management, synchronization, and group services - in a simple interface so you don't have to write them from scratch. You can use it off-the-shelf to implement consensus, group management, leader election, and presence protocols.
+
+h2. Requirements
+
+* Django 1.0+
+
+h2. Usage
+
+Add a path zkadmin/servers.py, follow the example in that file.
+
+* ZOOKEEPER_SERVERS - host:port(,host:port)* of all servers in your cluster. This is the same information that you provide in your ZooKeeper client configuration.
+
+then start the django server
+
+Finally open a link in your browser to the server: "http://127.0.0.1:8000/":http://127.0.0.1:8000/
+
+ZooKeeper client output is written to "cli_log.txt".
+
+h2. Limitations
+
+ACLs are supported by kazoo. Adding auth_data in zkadmin/servers.py for each cluster.
+
+h2. Screenshots
+
+h3. Cluster Summary
+<iframe src="https://www.flickr.com/photos/126871171@N03/15000042970/player/" width="75" height="75" frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+
+h3. Server Summary
+<a href="https://www.flickr.com/photos/126871171@N03/15000143168" title="2 by jammy wolf, on Flickr"><img src="https://farm6.staticflickr.com/5559/15000143168_ee4b364efb_s.jpg" width="75" height="75" alt="2"></a>
+
+h3. ZNode tree
+
+1. overview
+<a href="https://www.flickr.com/photos/126871171@N03/15186340362" title="4 by jammy wolf, on Flickr"><img src="https://farm4.staticflickr.com/3864/15186340362_fcd5fcb10e_s.jpg" width="75" height="75" alt="4"></a>
+
+2. If you have the auth to browse the node, you will see:
+<a href="https://www.flickr.com/photos/126871171@N03/15000143338" title="3 by jammy wolf, on Flickr"><img src="https://farm6.staticflickr.com/5570/15000143338_115175c7c2_s.jpg" width="75" height="75" alt="3"></a>
+
+3. If you have not the auth, you will see:
+<a href="https://www.flickr.com/photos/126871171@N03/14999938909" title="6 by jammy wolf, on Flickr"><img src="https://farm6.staticflickr.com/5558/14999938909_b274ec5425_s.jpg" width="75" height="75" alt="6"></a>
